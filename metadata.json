@@ -1,0 +1,6 @@
+{
+  "name": "Divora — Autonomous NFT Trading Agent",
+  "description": "Deterministic policy-governed NFT trading agent on Robinhood Chain (4663) with comparable floor pricing, Seaport 1.6 fulfillment validation, and read-only RPC buy simulation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

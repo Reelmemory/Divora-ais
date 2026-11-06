@@ -1,0 +1,10 @@
+{
+  "name": "@divora/market",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "scripts": { "build": "tsc -p tsconfig.json", "typecheck": "tsc -p tsconfig.json --noEmit", "test": "node --test test/market.test.mjs test/orders.test.mjs test/pipeline.test.mjs test/readiness.test.mjs test/rank.test.mjs" },
+  "dependencies": { "@divora/shared": "0.0.0", "@divora/opportunities": "0.0.0", "@divora/policy": "0.0.0", "@divora/tx": "0.0.0", "viem": "^2.37.5" }
+}
+

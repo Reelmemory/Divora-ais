@@ -1,0 +1,243 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Connected-wallet user. No key material is stored.
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  wallets   Wallet[]
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  address   String
+  chainId   Int
+  mode      String   @default("connected")
+  createdAt DateTime @default(now())
+  positions PortfolioPosition[]
+  trades    Trade[]
+
+  @@unique([address, chainId])
+}
+
+model Collection {
+  id        String  @id @default(cuid())
+  chainId   Int
+  address   String
+  name      String?
+  slug      String?
+  assets    Asset[]
+
+  @@unique([chainId, address])
+}
+
+model Asset {
+  id           String             @id @default(cuid())
+  collectionId String
+  collection   Collection         @relation(fields: [collectionId], references: [id])
+  tokenId      String
+  positions    PortfolioPosition[]
+
+  @@unique([collectionId, tokenId])
+}
+
+/// Ledger row only. Phase 0 does not write trades.
+model Trade {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  chainId   Int
+  side      String
+  status    String
+  walletId  String?
+  wallet    Wallet?  @relation(fields: [walletId], references: [id])
+  txHash    String?
+}
+
+model PortfolioPosition {
+  id        String   @id @default(cuid())
+  walletId  String
+  wallet    Wallet   @relation(fields: [walletId], references: [id])
+  assetId   String
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  quantity  Int      @default(1)
+  updatedAt DateTime @updatedAt
+
+  @@unique([walletId, assetId])
+}
+
+model AuditEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  kind      String
+  payload   Json
+}
+
+model OpportunityRecord {
+  id              String   @id
+  chainId         Int
+  chainKey        String
+  contract        String
+  tokenId         String?
+  collectionName  String?
+  status          String
+  strategy        String?
+  score           Float?
+  confidence      Float
+  observedPrice   String?
+  referencePrice  String?
+  fairValue       String?
+  priceDeviation  Float?
+  evidence        Json
+  analysis        Json
+  observedAt      DateTime
+  expiresAt       DateTime
+  updatedAt       DateTime
+  signals         OpportunitySignal[]
+  scoreResult     OpportunityScore?
+
+  @@unique([chainId, contract, tokenId])
+  @@index([strategy, status])
+  @@index([status, score])
+  @@index([chainId, contract])
+}
+
+model OpportunitySignal {
+  id            String            @id @default(cuid())
+  opportunityId String
+  opportunity   OpportunityRecord @relation(fields: [opportunityId], references: [id])
+  category      String
+  code          String
+  applicable    Boolean
+  score         Float
+  weight        Float
+  explanation   String
+  evidence      Json
+
+  @@index([opportunityId, category])
+}
+
+model OpportunityScore {
+  id            String            @id @default(cuid())
+  opportunityId String            @unique
+  opportunity   OpportunityRecord @relation(fields: [opportunityId], references: [id])
+  total         Float?
+  explanation   Json
+  bounded       Boolean           @default(true)
+}
+
+model DecisionRecord {
+  id               String   @id
+  opportunityId    String
+  action           String
+  status           String
+  confidence       Float
+  riskLevel        String
+  reasoning        String
+  supportingSignals Json
+  rejectionReasons Json
+  opportunityScore Float?
+  strategy         String?
+  collection       String
+  createdAt        DateTime
+  expiresAt        DateTime
+  execution        String   @default("disabled")
+  risk             RiskAssessmentRecord?
+  policy           PolicyEvaluationRecord?
+
+  @@index([action, riskLevel])
+  @@index([strategy, collection])
+  @@index([opportunityId])
+}
+
+model RiskAssessmentRecord {
+  id          String         @id @default(cuid())
+  decisionId  String         @unique
+  decision    DecisionRecord @relation(fields: [decisionId], references: [id])
+  level       String
+  findings    Json
+}
+
+model PolicyEvaluationRecord {
+  id             String         @id @default(cuid())
+  decisionId     String         @unique
+  decision       DecisionRecord @relation(fields: [decisionId], references: [id])
+  allowed        Boolean
+  violations     Json
+  warnings       Json
+  evaluatedRules Json
+}
+
+model TransactionIntentRecord {
+  id             String   @id
+  orderHash      String?  @unique
+  decisionId     String   @unique
+  opportunityId  String
+  chainId        Int
+  contract       String
+  tokenId        String
+  marketplace    String
+  expectedPrice  String
+  maxPrice       String
+  estimatedGas   String
+  slippageBps    Int
+  payload        Json
+  createdAt      DateTime
+  expiresAt      DateTime
+  executable     Boolean  @default(false)
+  validation     IntentValidationRecord?
+  simulations    SimulationResultRecord[]
+
+  @@unique([chainId, contract, tokenId, marketplace])
+  @@index([decisionId, opportunityId])
+  @@index([chainId, contract])
+}
+
+model IntentValidationRecord {
+  id             String                  @id @default(cuid())
+  intentId       String                  @unique
+  intent         TransactionIntentRecord @relation(fields: [intentId], references: [id])
+  valid          Boolean
+  violations     Json
+  warnings       Json
+  evaluatedRules Json
+}
+
+model SimulationResultRecord {
+  id          String                  @id
+  intentId    String
+  intent      TransactionIntentRecord @relation(fields: [intentId], references: [id])
+  state       String
+  success     Boolean
+  revertReason String?
+  payload     Json
+  createdAt   DateTime
+  expiresAt   DateTime
+  executable  Boolean                 @default(false)
+
+  @@index([intentId, state])
+}
+
+model MarketListingSnapshot {
+  id         String   @id
+  chainId    Int
+  marketplace String
+  contract   String?
+  tokenId    String?
+  price      String?
+  seller     String?
+  freshness  String
+  observedAt DateTime
+  payload    Json
+
+  @@index([chainId, contract])
+  @@index([freshness, observedAt])
+}

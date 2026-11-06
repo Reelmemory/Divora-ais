@@ -1,0 +1,23 @@
+{
+  "name": "@divora/agent",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "tsx src/worker.ts"
+  },
+  "dependencies": {
+    "@divora/shared": "0.0.0",
+    "@divora/market": "0.0.0",
+    "@divora/tx": "0.0.0",
+    "@prisma/client": "^6.5.0"
+  }
+}

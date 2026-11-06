@@ -1,0 +1,52 @@
+{
+  "name": "react-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "start": "tsx server.ts",
+    "link:packages": "node scripts/link-packages.mjs",
+    "build:packages": "node scripts/link-packages.mjs && tsc -p packages/shared/tsconfig.json && tsc -p packages/chains/tsconfig.json && tsc -p packages/wallets/tsconfig.json && tsc -p packages/policy/tsconfig.json && tsc -p packages/opportunities/tsconfig.json && tsc -p packages/nft/tsconfig.json && tsc -p packages/tx/tsconfig.json && tsc -p packages/market/tsconfig.json && tsc -p packages/agent/tsconfig.json",
+    "build": "npm run build:packages && vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist server.js",
+    "lint": "tsc --noEmit",
+    "typecheck": "npm run build:packages && tsc --noEmit",
+    "test:opportunities": "npm run build:packages && node --test packages/opportunities/test/engine.test.mjs",
+    "test:policy": "npm run build:packages && node --test packages/policy/test/decision.test.mjs",
+    "test:tx": "npm run build:packages && node --test packages/tx/test/intent.test.mjs packages/tx/test/rpc.test.mjs",
+    "test:market": "npm run build:packages && node --test packages/market/test/market.test.mjs packages/market/test/orders.test.mjs packages/market/test/pipeline.test.mjs packages/market/test/readiness.test.mjs packages/market/test/rank.test.mjs",
+    "test:all": "npm run build:packages && node --test packages/opportunities/test/*.mjs packages/policy/test/*.mjs packages/tx/test/*.mjs packages/market/test/*.mjs",
+    "prisma:validate": "prisma validate",
+    "prisma:generate": "prisma generate",
+    "smoke:chain": "node scripts/smoke-chain.mjs",
+    "smoke:discovery": "node scripts/smoke-discovery.mjs"
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "@prisma/client": "^6.16.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "viem": "^2.37.5",
+    "vite": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.25.0",
+    "prisma": "^6.16.2",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2"
+  }
+}

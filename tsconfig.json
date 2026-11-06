@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@divora/shared": ["./packages/shared/src/index.ts"],
+      "@divora/chains": ["./packages/chains/src/index.ts"],
+      "@divora/wallets": ["./packages/wallets/src/index.ts"],
+      "@divora/nft": ["./packages/nft/src/index.ts"],
+      "@divora/opportunities": ["./packages/opportunities/src/index.ts"],
+      "@divora/policy": ["./packages/policy/src/index.ts"],
+      "@divora/tx": ["./packages/tx/src/index.ts"],
+      "@divora/market": ["./packages/market/src/index.ts"],
+      "@divora/agent": ["./packages/agent/src/index.ts"]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": ["src", "server.ts"]
+}
